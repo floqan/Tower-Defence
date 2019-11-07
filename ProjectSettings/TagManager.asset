@@ -5,6 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - Kristall
+  - Stats
+  - Enemy
+  - Tower
+  - Merchant
+  - Field
+  - Tower - Normal
   layers:
   - Default
   - TransparentFX
@@ -14,7 +20,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Grid
   - 
   - 
   - 

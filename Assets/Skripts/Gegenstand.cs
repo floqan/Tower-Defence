@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class Gegenstand
 {
-    
+    public Sprite Icon;
     private string name;
-
-
 
     public void SetName(string name)
     {
