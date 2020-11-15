@@ -28,14 +28,34 @@ public class GameManager : MonoBehaviour
     // ---------- PARAMETER ----------
     private int currentGold;
     public int maxGold;
-    private float currentHealth;
+    private int currentHealth;
     private int currentWave;
     private bool gridUpdated;
+    private int targetState;
 
     // ---------- Enemies ----------
     public List<GameObject> passiveEnemies = new List<GameObject>();
     public Queue<Enemy> enemies = new Queue<Enemy>();
     public List<GameObject> enemySpawns = new List<GameObject>();
+
+
+    private void Start()
+    {
+        inventory = Inventory.instance;
+        targetState = 0;
+        RefillHealth();
+        ui.UpdateStatsUI();
+        grid.initGrid();
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        time += Time.deltaTime;
+        if (time >= spawnTime)
+        {
+            createNewEnemy();
+        }
+    }
 
     internal void refreshGrid()
     {
@@ -69,21 +89,6 @@ public class GameManager : MonoBehaviour
         this.maxGold = maxGold;
     }
 
-    private void Start()
-    {
-        inventory = Inventory.instance;
-        RefillHealth();
-        ui.UpdateStatsUI();
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        time += Time.deltaTime;
-        if(time >= spawnTime)
-        {
-            createNewEnemy();
-        }
-    }
 
     private void LateUpdate()
     {
@@ -96,7 +101,7 @@ public class GameManager : MonoBehaviour
         if (enemies.Count > 0) {
             Debug.Log("Spawning Enemy");
             Enemy enemy = enemies.Dequeue();
-            enemy.Mesh = Instantiate(enemy.Mesh, enemySpawns[0].transform.position + new Vector3(0,0,20), Quaternion.identity);
+            enemy.Mesh = Instantiate(enemy.Mesh, enemySpawns[0].transform.position, Quaternion.identity);
             enemy.Mesh.GetComponent<EnemyBehaviour>().enemy = enemy;
         }
     }
@@ -120,7 +125,7 @@ public class GameManager : MonoBehaviour
         if (!(building is Plant))
         {
             grid.setBuildingOnGrid(building);
-            grid.updateGrid();
+            refreshGrid();
         }
         ui.UpdateStatsUI();
     }
@@ -166,23 +171,38 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool DecreaseCurrentHealth(float currentHealth)
+    public void DecreaseCurrentHealth(int damage)
     {
-        if (this.currentHealth - currentHealth <= 0)
+        this.currentHealth -= damage;
+        if(currentHealth <= 0)
         {
-            this.currentHealth = 0;
-            ui.UpdateStatsUI();
-            return false;
+            currentHealth = 0;
         }
-        else
-        {
-            this.currentHealth -= currentHealth;
-            ui.UpdateStatsUI();
-            return false;
-        }
+        ui.UpdateStatsUI();
+        updateTargetModel();
+       
     }
 
-    public void IncreaseCurrentHealth(float health)
+    private void updateTargetModel()
+    {
+        int currentState = 4;
+        int counter = currentHealth;
+        while(counter > 0)
+        {
+            counter -= 25;
+            currentState--;
+        }
+        if (currentState != targetState) {
+            targetState = currentState;
+            GameObject[] models = GameObject.FindGameObjectsWithTag("Target");
+            foreach (GameObject model in models)
+            {
+                model.GetComponent<ChangeModel>().ChangeTargetModel(targetState);
+            }
+        } 
+    }
+
+    public void IncreaseCurrentHealth(int health)
     {
         this.currentHealth += health;
         if(this.currentHealth > 1)
@@ -193,8 +213,8 @@ public class GameManager : MonoBehaviour
 
     public void RefillHealth()
     {
-        currentHealth = 1.0f;
-        Update();
+        currentHealth = 100;
+        ui.UpdateStatsUI();
     }
 
     public void IncreaseCurrentWave()

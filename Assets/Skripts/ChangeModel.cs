@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ChangeModel : MonoBehaviour
 {
-    private int state = 0;
 
     public GameObject[] models;
     
@@ -14,10 +13,9 @@ public class ChangeModel : MonoBehaviour
     void Start()
     {
         Debug.Log("Start");
-        ChangeKristallModel();
     }
 
-    public void ChangeKristallModel()
+    public void ChangeTargetModel(int state)
     {
         if (state < models.Length)
         {
@@ -25,7 +23,6 @@ public class ChangeModel : MonoBehaviour
             currentModel = Instantiate(models[state], transform.position, Quaternion.Euler(-9, 9, 17.5f));
             currentModel.transform.parent = transform;
             currentModel.transform.localScale = new Vector3(10, 10, 10);
-            state++;
         }
     }
 }

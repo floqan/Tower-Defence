@@ -22,9 +22,9 @@ public class BottomUI : MonoBehaviour
         return gm.getCurrentGold();
     }
 
-    private float getCurrentHealth()
+    private float getCurrentHealthForUI()
     {
-        return gm.getCurrentHealth();
+        return ((float)gm.getCurrentHealth()) / 100f;
     }
 
     private int getCurrentWave()
@@ -100,7 +100,7 @@ public class BottomUI : MonoBehaviour
         if (tmp != null)
         {
             tmp.transform.GetChild(1).GetComponent<Text>().text = getCurrentGold().ToString();
-            tmp.transform.GetChild(3).GetChild(1).GetComponent<Image>().fillAmount = getCurrentHealth();
+            tmp.transform.GetChild(3).GetChild(1).GetComponent<Image>().fillAmount = getCurrentHealthForUI();
             tmp.transform.GetChild(5).GetComponent<Text>().text = getCurrentWave().ToString();
         }
     }

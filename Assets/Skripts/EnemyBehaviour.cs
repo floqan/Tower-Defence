@@ -8,6 +8,8 @@ public class EnemyBehaviour : MonoBehaviour
     public Enemy enemy = new Enemy();
     GroundGrid grid;
     bool targetReached;
+    public float attackTime;
+    private float currentTime;
 
     private void Awake()
     {
@@ -21,8 +23,9 @@ public class EnemyBehaviour : MonoBehaviour
     {
         //enemy = GameManager.instance.enemies.Dequeue();
         targetReached = false;
+        currentTime = attackTime;
         grid = FindObjectOfType<GroundGrid>();
-        setNextGoal();
+        setNextGoal(true);
         enemy.CurrentHitpoints = enemy.MaxHitpoint;
         enemy.LastGoal = transform.position;
         KeyValuePair<int, int> pos = grid.getGridKoordinates(enemy.LastGoal);
@@ -34,7 +37,8 @@ public class EnemyBehaviour : MonoBehaviour
     {
         if (!targetReached)
         {
-            transform.position = Vector3.MoveTowards(transform.position, enemy.NextGoal, enemy.Velocity * Time.deltaTime);
+            Vector3 newPos = Vector3.MoveTowards(transform.position, enemy.NextGoal, enemy.Velocity * Time.deltaTime);
+            transform.position = new Vector3(newPos.x, TerrainData.instance.getTerrainHeight(transform.position), newPos.z);
 
             if (isGoalReached())
             {
@@ -45,12 +49,17 @@ public class EnemyBehaviour : MonoBehaviour
                     grid.gridSlots[pos.Key, pos.Value].enemyCounter--;
                 }
                 else {
-                    setNextGoal();
+                    setNextGoal(false);
                 } }
         }
         else
         {
-            throw new NotImplementedException();
+            currentTime += Time.deltaTime;
+            if (currentTime > attackTime) {
+                Debug.LogWarning("Attack-Animation not implemented yet.");
+                currentTime = 0;
+                attack();
+            }
         }
     }
 
@@ -69,7 +78,7 @@ public class EnemyBehaviour : MonoBehaviour
         Destroy(gameObject);
     }
 
-    void setNextGoal()
+    void setNextGoal(bool init)
     {
         int left, up, right, down;
         left = right = up = down = int.MaxValue;
@@ -153,7 +162,10 @@ public class EnemyBehaviour : MonoBehaviour
             }
         }
         KeyValuePair<int, int> unlock = grid.getGridKoordinates(enemy.LastGoal);
-        grid.gridSlots[unlock.Key, unlock.Value].enemyCounter--;
+        if (!init)
+        {
+            grid.gridSlots[unlock.Key, unlock.Value].enemyCounter--;
+        }
         enemy.LastGoal = enemy.NextGoal;
         Vector3 goal = Vector3.zero;
         switch (way)
@@ -171,7 +183,7 @@ public class EnemyBehaviour : MonoBehaviour
                 goal = grid.getNearestGridPoint(new KeyValuePair<int, int>(node.Key, node.Value + 1));
                 break;
         }
-        enemy.NextGoal = new Vector3(goal.x, transform.position.y, goal.z);
+        enemy.NextGoal = new Vector3(goal.x, TerrainData.instance.getTerrainHeight(goal), goal.z);
         unlock = grid.getGridKoordinates(enemy.NextGoal);
         grid.gridSlots[unlock.Key, unlock.Value].enemyCounter++;
     }
@@ -190,5 +202,10 @@ public class EnemyBehaviour : MonoBehaviour
     bool isGoalReached()
     {
         return Vector3.Distance(transform.position, enemy.NextGoal) < 0.0001f;
+    }
+
+    private void attack()
+    {
+        GameManager.instance.DecreaseCurrentHealth(enemy.Damage);
     }
 }

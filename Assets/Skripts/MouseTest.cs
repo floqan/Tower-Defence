@@ -25,7 +25,7 @@ public class MouseTest : MonoBehaviour
     {
         rend.material.color = Color.blue;
         ChangeModel chan = GameObject.FindGameObjectWithTag("Kristall").GetComponent<ChangeModel>();
-        chan.ChangeKristallModel();
+        chan.ChangeTargetModel(0);
         
     }
 

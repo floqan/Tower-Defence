@@ -15,47 +15,46 @@ public class GroundGrid : MonoBehaviour
     private Vector3 selected;
     public bool showGrid = false;
 
+
     public GridPlatz[,] gridSlots;
     public List<KeyValuePair<int, int>> targets;
     public int[,] steps;
 
-    // Start is called before the first frame update
-    void Start()
+    public void initGrid()
     {
+        //init variables
         steps = new int[dimensionX, dimensionZ];
-        gridSlots = new GridPlatz[dimensionX,dimensionZ];
+        gridSlots = new GridPlatz[dimensionX, dimensionZ];
         targets = new List<KeyValuePair<int, int>>();
         for (int i = 0; i < dimensionX; i++)
         {
-            for(int x = 0; x < dimensionZ; x++)
+            for (int x = 0; x < dimensionZ; x++)
             {
                 gridSlots[i, x] = new GridPlatz();
             }
         }
-        targets.Add(new KeyValuePair<int, int>(24,24));
-        targets.Add(new KeyValuePair<int, int>(24,25));
-        targets.Add(new KeyValuePair<int, int>(25,24));
-        targets.Add(new KeyValuePair<int, int>(25,25));
-        foreach (KeyValuePair<int, int> node in targets) {
-            gridSlots[node.Key, node.Value].besetzt = true;
+
+        //Setup for Environment
+        for (int x = 0; x < dimensionX; x++)
+        {
+            for (int z = 0; z < dimensionZ; z++)
+            {
+                Vector3 pos = getNearestGridPoint(new KeyValuePair<int, int>(x, z));
+                RaycastHit hit;
+                if (Physics.Raycast(pos, Vector3.up, out hit, size, LayerMask.GetMask("Environment")))
+                {
+                    if(hit.transform.tag == "Target")
+                    {
+                        targets.Add(new KeyValuePair<int, int>(x,z));
+                    }
+                    gridSlots[x, z].besetzt = true;
+                }
+            }
         }
-        gridSlots[11, 13].besetzt = true;
-        gridSlots[11, 12].besetzt = true;
-        gridSlots[11, 11].besetzt = true;
-        gridSlots[11, 10].besetzt = true;
-        gridSlots[41, 16].besetzt = true;
-        gridSlots[14, 1].besetzt = true;
+
         updateGrid();
-
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+    
     public virtual void updateGrid()
     {
         steps = new int[dimensionX, dimensionZ];
@@ -263,12 +262,13 @@ public class GroundGrid : MonoBehaviour
 
     public Vector3 getNearestGridPoint(KeyValuePair<int, int> node)
     {
-        return new Vector3(node.Key * size + offset.x + 0.5f * size, 0, node.Value * size + offset.z + 0.5f * size);
+        Vector3 pos = new Vector3(node.Key * size + offset.x + 0.5f * size, 0, node.Value * size + offset.z + 0.5f * size);
+        pos.y = TerrainData.instance.getTerrainHeight(pos);
+        return pos;
     }
 
     void onClick()
     {
         Debug.Log("Clicked");
     }
-
 }

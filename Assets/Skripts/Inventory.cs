@@ -43,12 +43,6 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void addItemsToInventory(int item, int count)
     {
         inventory[item] += count;
@@ -77,6 +71,17 @@ public class Inventory : MonoBehaviour
     public int getMaxSpace()
     {
         return maxSpace;
+    }
+
+    public void increaseMaxSpace(int increaseAmount)
+    {
+        this.maxSpace += increaseAmount;
+    }
+
+    public void decreaseMaxSpace(int decreaseAmount)
+    {
+        this.maxSpace -= decreaseAmount;
+        if (maxSpace < 0) maxSpace = 0;
     }
 
     public void setMaxSpace(int maxSpace) {

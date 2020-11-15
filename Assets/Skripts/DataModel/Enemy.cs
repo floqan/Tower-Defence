@@ -6,6 +6,7 @@ public class Enemy
     public string Name;
     public int MaxHitpoint;
     public int CurrentHitpoints;
+    public int Damage;
     public int Strength;
     public GameObject Mesh;
 
@@ -26,5 +27,6 @@ public class Enemy
         Strength = enemy.Strength; ;
         Mesh = enemy.Mesh;
         Velocity = enemy.Velocity;
+        Damage = enemy.Damage;
     }
 }

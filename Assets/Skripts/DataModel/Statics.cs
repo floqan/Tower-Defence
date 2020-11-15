@@ -57,6 +57,7 @@ public static class Statics
         Name = "enemyOne",
         Mesh = Resources.Load<GameObject>("Enemies/EnemyOne"),
         Velocity = 5f,
-        MaxHitpoint = 15
+        MaxHitpoint = 15,
+        Damage = 5
     };
 }

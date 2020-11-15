@@ -20,7 +20,6 @@ public class InventorySlot : MonoBehaviour
     {
         gameObject.SetActive(false);
         text.text = "";
-        
     }
 
     public void updateDisplay()
